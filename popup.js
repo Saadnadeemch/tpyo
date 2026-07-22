@@ -1,4 +1,4 @@
-
+// popup.js — drives the Tpyo extension popup interface.
 
 const settingsToggle = document.getElementById("coh-settings-toggle");
 const genView = document.getElementById("coh-view-generate");
@@ -30,6 +30,7 @@ settingsToggle.addEventListener("click", () => {
 });
 bannerLink.addEventListener("click", goToSettings);
 
+// ---------- Settings View ----------
 
 const apiKeyEl = document.getElementById("coh-api-key");
 const settingsStatusEl = document.getElementById("coh-settings-status");
@@ -65,6 +66,8 @@ document.getElementById("coh-save-settings").addEventListener("click", async () 
 
 loadSettings();
 
+// ---------- Generate View ----------
+
 const previewEl = document.getElementById("coh-preview"); 
 const refreshEl = document.getElementById("coh-refresh");
 const toneButtons = document.querySelectorAll(".coh-segment-btn");
@@ -79,6 +82,7 @@ const resultEl = document.getElementById("coh-result");
 const resultTextEl = document.getElementById("coh-result-text");
 const regenBox = document.getElementById("coh-regen-box");
 const regenInput = document.getElementById("coh-regen-input");
+const regenSubmitBtn = document.getElementById("coh-regen-submit");
 
 let selectedTone = "professional";
 let lastResult = null;
@@ -110,25 +114,25 @@ function clearError() {
 }
 
 async function pullActiveText() {
-  previewEl.placeholder = "Loading from page…";
+  previewEl.placeholder = "Loading active page selection…";
 
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id) {
-      previewEl.placeholder = "Paste your email/DM text here…";
+      previewEl.placeholder = "Paste your message text here…";
       return;
     }
     activeTabId = tab.id;
 
     chrome.tabs.sendMessage(tab.id, { type: "COH_GET_ACTIVE_TEXT" }, (res) => {
       if (chrome.runtime.lastError || !res || !res.ok || !res.hasField || !res.text?.trim()) {
-        previewEl.placeholder = "Paste your email/DM text here…";
+        previewEl.placeholder = "Paste your message text here…";
         return;
       }
       previewEl.value = res.text;
     });
   } catch (err) {
-    previewEl.placeholder = "Paste your email/DM text here…";
+    previewEl.placeholder = "Paste your message text here…";
   }
 }
 
@@ -140,20 +144,20 @@ function runGeneration(additionalInstructions) {
 
   const text = previewEl.value.trim();
   if (!text) {
-    showError("Paste or write some text first.");
+    showError("Please paste or type text first.");
     return;
   }
 
   generateBtn.disabled = true;
   generateBtn.innerHTML = `<span class="coh-spinner"></span>Generating...`;
 
-  const prompt = coh_buildPrompt({
+  const prompt = typeof coh_buildPrompt === "function" ? coh_buildPrompt({
     text,
     tone: selectedTone,
     typoTier: tiers[Number(slider.value)],
     lowercase: lowercaseEl.checked,
     additionalInstructions: additionalInstructions || null
-  });
+  }) : `Rewrite this text in a ${selectedTone} human style: ${text}`;
 
   chrome.runtime.sendMessage({ type: "COH_GENERATE", prompt }, (res) => {
     generateBtn.disabled = false;
@@ -164,20 +168,30 @@ function runGeneration(additionalInstructions) {
       return;
     }
     if (!res || !res.ok) {
-      showError((res && res.error) || "Something went wrong.");
+      showError((res && res.error) || "Unable to generate response.");
       return;
     }
 
-    // Handles the direct raw text string coming from background.js
     lastResult = res.data;
     resultTextEl.textContent = res.data || "";
     formEl.classList.add("coh-hidden");
     resultEl.classList.remove("coh-hidden");
     regenBox.style.display = "none";
+    regenInput.value = "";
   });
 }
 
 generateBtn.addEventListener("click", () => runGeneration());
+
+// Global Ctrl + Enter / Cmd + Enter Keyboard Shortcut
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    if (genView.classList.contains("active") && formEl.classList.contains("coh-hidden") === false) {
+      e.preventDefault();
+      runGeneration();
+    }
+  }
+});
 
 resultEl.addEventListener("click", (e) => {
   const action = e.target.dataset?.action;
@@ -202,9 +216,18 @@ resultEl.addEventListener("click", (e) => {
   }
 });
 
-document.getElementById("coh-regen-submit").addEventListener("click", () => {
+function triggerRegenWithEdits() {
   const note = regenInput.value.trim();
   formEl.classList.remove("coh-hidden");
   resultEl.classList.add("coh-hidden");
   runGeneration(note || null);
-}); 
+}
+
+regenSubmitBtn.addEventListener("click", triggerRegenWithEdits);
+
+regenInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    triggerRegenWithEdits();
+  }
+});

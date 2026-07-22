@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Cold Outreach Humanizer",
+  "name": "Tpyo",
   "version": "1.0.0",
-  "description": "Rewrites AI-drafted cold emails/DMs so they read like a human typed them fast.",
+  "description": "Humanize your Dm's.",
   "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
   "host_permissions": [
     "https://generativelanguage.googleapis.com/*"
@@ -20,7 +20,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Cold Outreach Humanizer — Settings",
+    "default_title": "Tpyo — Humanize your response",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -31,5 +31,20 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "commands": {
+    "trigger-tpyo": {
+      "suggested_key": {
+        "default": "Alt+T",
+        "mac": "Alt+T"
+      },
+      "description": "Trigger Tpyo Humanizer panel on active field"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/icon.png", "icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

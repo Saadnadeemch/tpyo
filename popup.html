@@ -2,294 +2,425 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Humanizer</title>
+<title>Tpyo</title>
 <style>
   :root {
     color-scheme: light;
-    --ink: #17171a;
-    --ink-soft: #5b5b63;
-    --line: #e8e7e4;
-    --paper: #fbfaf8;
-    --card: #ffffff;
-    --accent: #7a2e2e;
-    --accent-hover: #5f2323;
+    --bg-main: #f8fafc;
+    --card-bg: rgba(255, 255, 255, 0.75);
+    --card-border: rgba(226, 232, 240, 0.8);
+    --text-primary: #0f0f11;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    
+    /* Slate accents */
+    --slate-dark: #1e293b;
+    --slate-hover: #334155;
+    --slate-light: #f1f5f9;
+    
+    /* Error states */
+    --error-red: #ef4444;
+    --error-bg: #fef2f2;
+    --error-border: #fee2e2;
   }
+
   * { box-sizing: border-box; }
+
   body {
-    width: 360px;
+    width: 380px;
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--paper);
-    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
   }
 
-  .coh-app { display: flex; flex-direction: column; }
+  .coh-app {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+  }
 
-  /* Header */
+  /* Header with Glassmorphism */
   .coh-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px 12px;
-    border-bottom: 1px solid var(--line);
+    padding: 12px 16px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    margin-bottom: 12px;
   }
-  .coh-brand { display: flex; align-items: center; gap: 8px; }
-  .coh-brand-mark {
-    width: 22px; height: 22px;
+
+  .coh-brand { display: flex; align-items: center; gap: 10px; }
+  .coh-brand-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
     border-radius: 6px;
-    background: var(--ink);
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 12px; font-weight: 700;
   }
-  .coh-brand-name { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .coh-brand-name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
 
   .coh-icon-btn {
-    width: 28px; height: 28px;
-    border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    color: var(--ink-soft);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    background: transparent;
   }
-  .coh-icon-btn:hover { background: #f0efec; color: var(--ink); }
-  .coh-icon-btn svg { width: 16px; height: 16px; }
+  .coh-icon-btn:hover {
+    background: var(--slate-light);
+    color: var(--text-primary);
+  }
+  .coh-icon-btn svg { width: 18px; height: 18px; }
 
-  /* Views */
-  .coh-view { display: none; padding: 18px; }
+  /* Glassmorphic Views */
+  .coh-view { display: none; }
   .coh-view.active { display: block; }
 
+  .coh-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  }
+
   .coh-label {
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #9a978f;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
     margin: 0 0 8px;
   }
-  .coh-section { margin-bottom: 18px; }
+
+  .coh-section { margin-bottom: 16px; }
   .coh-section:last-child { margin-bottom: 0; }
 
+  /* Inputs & Textareas */
   .coh-preview-textarea {
     width: 100%;
-    min-height: 80px;
-    max-height: 140px;
+    min-height: 90px;
+    max-height: 150px;
     resize: vertical;
-    font-size: 12.5px;
+    font-size: 13px;
     line-height: 1.5;
-    background: var(--card);
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 12px;
+    color: var(--text-primary);
+    border: 1px solid var(--card-border);
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .coh-preview-textarea:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(15, 15, 17, 0.05);
+  }
+  .coh-preview-textarea::placeholder { color: var(--text-muted); }
+
+  .coh-banner {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--error-red);
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
     border-radius: 12px;
     padding: 10px 12px;
-    color: #3a3a3f;
-    border: 1px solid var(--line);
-    font-family: inherit;
-  }
-  .coh-preview-textarea::placeholder { color: #b9b6ad; }
-  .coh-banner {
-    font-size: 11.5px;
-    line-height: 1.5;
-    color: #7a5b1e;
-    background: #fbf1dd;
-    border: 1px solid #f0dfb8;
-    border-radius: 10px;
-    padding: 9px 11px;
     margin-bottom: 14px;
+    font-weight: 500;
   }
-  .coh-banner span { text-decoration: underline; cursor: pointer; font-weight: 600; }
-  .coh-empty-hint { font-size: 12px; color: #a6a39b; }
+  .coh-banner span { text-decoration: underline; cursor: pointer; font-weight: 700; }
+
   .coh-refresh {
     font-size: 11px;
-    color: var(--ink-soft);
+    font-weight: 600;
+    color: var(--text-secondary);
     cursor: pointer;
     text-align: right;
     display: block;
     margin-top: 6px;
+    transition: color 0.15s;
   }
-  .coh-refresh:hover { color: var(--ink); text-decoration: underline; }
+  .coh-refresh:hover { color: var(--text-primary); text-decoration: underline; }
 
+  /* Segmented Controls */
   .coh-segment {
     display: flex;
-    background: var(--card);
-    border: 1px solid var(--line);
+    background: var(--slate-light);
+    border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 4px;
+    padding: 3px;
     gap: 4px;
   }
   .coh-segment-btn {
     flex: 1;
     text-align: center;
-    padding: 9px 0;
+    padding: 8px 0;
     border-radius: 9px;
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    color: var(--ink-soft);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
   }
-  .coh-segment-btn.active { background: var(--ink); color: #fff; }
+  .coh-segment-btn.active {
+    background: var(--text-primary);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
 
+  /* Sliders & Cards */
   .coh-slider-card {
-    background: var(--card);
-    border: 1px solid var(--line);
+    background: #ffffff;
+    border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 13px;
+    padding: 12px 14px;
   }
   input[type="range"] {
     width: 100%;
-    accent-color: var(--accent);
+    accent-color: var(--text-primary);
+    cursor: pointer;
   }
   .coh-slider-row {
     display: flex;
     justify-content: space-between;
-    font-size: 10.5px;
-    color: #a6a39b;
+    font-size: 11px;
+    color: var(--text-muted);
     margin-top: 6px;
     font-weight: 600;
   }
-  .coh-slider-row span.active-tier { color: var(--ink); }
+  .coh-slider-row span.active-tier { color: var(--text-primary); font-weight: 700; }
 
+  /* Checkboxes */
   .coh-checkbox-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-size: 12.5px;
-    color: #3a3a3f;
+    color: var(--slate-dark);
+    font-weight: 500;
   }
-  .coh-checkbox-row input { accent-color: var(--accent); width: 15px; height: 15px; }
+  .coh-checkbox-row input {
+    accent-color: var(--text-primary);
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
 
+  /* Buttons */
   .coh-generate-btn {
     width: 100%;
-    padding: 13px;
+    padding: 14px;
     border: none;
     border-radius: 12px;
-    background: var(--accent);
-    color: #fff;
+    background: var(--text-primary);
+    color: #ffffff;
     font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
     letter-spacing: 0.01em;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(15, 15, 17, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .coh-generate-btn:disabled { opacity: 0.45; cursor: default; }
-  .coh-generate-btn:hover:not(:disabled) { background: var(--accent-hover); }
+  .coh-generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .coh-generate-btn:hover:not(:disabled) {
+    background: #27272a;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15, 15, 17, 0.2);
+  }
+
+  .coh-shortcut-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 6px;
+    font-weight: 500;
+  }
 
   .coh-error {
-    margin-top: 10px;
+    margin-top: 12px;
     font-size: 12px;
-    color: #a13c2c;
-    background: #fbeae6;
-    border-radius: 8px;
-    padding: 9px 10px;
+    color: var(--error-red);
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    border-radius: 10px;
+    padding: 10px 12px;
     display: none;
+    font-weight: 500;
   }
 
   .coh-result-text {
     font-size: 13px;
     line-height: 1.6;
     white-space: pre-wrap;
-    background: var(--card);
+    background: #ffffff;
     border-radius: 12px;
-    padding: 12px;
-    max-height: 240px;
+    padding: 14px;
+    max-height: 220px;
     overflow-y: auto;
-    border: 1px solid var(--line);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
   }
+
   .coh-btn-row { display: flex; gap: 8px; margin-top: 12px; }
   .coh-btn {
     flex: 1;
-    padding: 10px 0;
-    border-radius: 11px;
+    padding: 11px 0;
+    border-radius: 10px;
     font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: #3a3a3f;
+    border: 1px solid var(--card-border);
+    background: #ffffff;
+    color: var(--slate-dark);
     text-align: center;
+    transition: all 0.15s ease;
   }
-  .coh-btn.coh-replace { background: var(--ink); border-color: var(--ink); color: #fff; }
-  .coh-btn.coh-replace:hover { background: #000; }
-  .coh-btn:hover { background: #f0efec; }
+  .coh-btn.coh-replace {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: #ffffff;
+  }
+  .coh-btn.coh-replace:hover { background: #27272a; }
+  .coh-btn:hover:not(.coh-replace) { background: var(--slate-light); color: var(--text-primary); }
 
-  .coh-regen-box { display: none; margin-top: 10px; }
+  /* Regenerate Container */
+  .coh-regen-box {
+    display: none;
+    margin-top: 12px;
+    background: var(--slate-light);
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid var(--card-border);
+  }
   .coh-regen-box input {
     width: 100%;
-    padding: 9px 10px;
+    padding: 10px 12px;
     font-size: 12.5px;
-    border-radius: 9px;
-    border: 1px solid var(--line);
-    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+    background: #ffffff;
+    color: var(--text-primary);
+  }
+  .coh-regen-box input:focus {
+    outline: none;
+    border-color: var(--text-primary);
   }
   .coh-regen-box button {
     margin-top: 8px;
     width: 100%;
-    padding: 9px;
-    font-size: 12.5px;
-    font-weight: 600;
-    border-radius: 9px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 8px;
     border: none;
-    background: var(--ink);
-    color: #fff;
+    background: var(--text-primary);
+    color: #ffffff;
     cursor: pointer;
+    transition: background 0.15s;
   }
-  .coh-regen-box button:hover { background: #000; }
+  .coh-regen-box button:hover { background: #27272a; }
 
   .coh-hidden { display: none !important; }
+
   .coh-spinner {
     display: inline-block;
-    width: 12px; height: 12px;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-top-color: #fff;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #ffffff;
     border-radius: 50%;
     animation: coh-spin 0.7s linear infinite;
-    margin-right: 6px;
-    vertical-align: -1px;
+    margin-right: 8px;
   }
   @keyframes coh-spin { to { transform: rotate(360deg); } }
 
-  /* Settings view */
-  .coh-settings-intro { font-size: 12px; color: var(--ink-soft); margin-bottom: 14px; line-height: 1.5; }
-  label.coh-field-label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #3a3a3f; }
+  /* Settings View Specifics */
+  .coh-settings-intro {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  label.coh-field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--slate-dark);
+  }
   .coh-key-row { position: relative; }
   input[type="password"], input[type="text"].coh-key-input {
     width: 100%;
-    padding: 9px 40px 9px 10px;
+    padding: 10px 42px 10px 12px;
     font-size: 13px;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    background: #ffffff;
+  }
+  input[type="password"]:focus, input[type="text"].coh-key-input:focus {
+    outline: none;
+    border-color: var(--text-primary);
   }
   .toggle-key {
     position: absolute;
-    right: 8px; top: 50%;
+    right: 10px; top: 50%;
     transform: translateY(-50%);
-    font-size: 10.5px;
-    color: var(--ink-soft);
+    font-size: 10px;
+    color: var(--text-secondary);
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
   }
-  .coh-hint { font-size: 11px; color: #9a978f; margin-top: 8px; line-height: 1.5; }
-  .coh-hint a { color: var(--ink-soft); }
+  .coh-hint { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }
+  .coh-hint a { color: var(--text-secondary); font-weight: 600; }
+  
   #coh-save-settings {
     width: 100%;
     margin-top: 16px;
-    padding: 10px;
+    padding: 12px;
     font-size: 13px;
     font-weight: 700;
     border: none;
-    border-radius: 9px;
-    background: var(--ink);
-    color: #fff;
+    border-radius: 10px;
+    background: var(--text-primary);
+    color: #ffffff;
     cursor: pointer;
+    transition: background 0.15s;
   }
-  #coh-save-settings:hover { background: #000; }
-  #coh-settings-status { margin-top: 10px; font-size: 12px; text-align: center; min-height: 14px; }
-  #coh-settings-status.ok { color: #1a7f37; }
-  #coh-settings-status.err { color: #a13c2c; }
+  #coh-save-settings:hover { background: #27272a; }
+  #coh-settings-status { margin-top: 10px; font-size: 12px; text-align: center; min-height: 14px; font-weight: 600; }
+  #coh-settings-status.ok { color: #10b981; }
+  #coh-settings-status.err { color: var(--error-red); }
 </style>
 </head>
 <body>
   <div class="coh-app">
+    <!-- GLASS HEADER -->
     <div class="coh-header">
       <div class="coh-brand">
-        <div class="coh-brand-mark">H</div>
-        <div class="coh-brand-name">Humanizer</div>
+        <img src="icons/logo.png" class="coh-brand-logo" alt="Tpyo Logo" />
       </div>
       <div class="coh-icon-btn" id="coh-settings-toggle" title="Settings">
         <svg id="coh-icon-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -301,74 +432,79 @@
 
     <!-- MAIN / GENERATE VIEW -->
     <div class="coh-view active" id="coh-view-generate">
-      <div id="coh-form">
-        <div class="coh-banner coh-hidden" id="coh-no-key-banner">
-          No Gemini API key set yet — <span id="coh-banner-link">open Settings</span> to add one.
-        </div>
-
-        <div class="coh-section">
-          <div class="coh-label">Your text (edit or paste to replace)</div>
-          <textarea class="coh-preview-textarea" id="coh-preview"></textarea>
-          <div class="coh-refresh" id="coh-refresh">refresh from page</div>
-        </div>
-
-        <div class="coh-section">
-          <div class="coh-label">Tone</div>
-          <div class="coh-segment">
-            <div class="coh-segment-btn active" data-tone="professional">Professional</div>
-            <div class="coh-segment-btn" data-tone="conversational">Conversational</div>
+      <div class="coh-card">
+        <div id="coh-form">
+          <div class="coh-banner coh-hidden" id="coh-no-key-banner">
+            Gemini API key missing — <span id="coh-banner-link">configure Settings</span> to activate.
           </div>
-        </div>
 
-        <div class="coh-section">
-          <div class="coh-label">Typo range</div>
-          <div class="coh-slider-card">
-            <input type="range" id="coh-typo-slider" min="0" max="2" step="1" value="1" />
-            <div class="coh-slider-row">
-              <span data-tier="0">Low</span><span data-tier="1">Medium</span><span data-tier="2">High</span>
+          <div class="coh-section">
+            <div class="coh-label">Your text</div>
+            <textarea class="coh-preview-textarea" id="coh-preview"></textarea>
+            <div class="coh-refresh" id="coh-refresh">refresh from page</div>
+          </div>
+
+          <div class="coh-section">
+            <div class="coh-label">Tone</div>
+            <div class="coh-segment">
+              <div class="coh-segment-btn active" data-tone="professional">Professional</div>
+              <div class="coh-segment-btn" data-tone="conversational">Conversational</div>
             </div>
           </div>
-        </div>
 
-        <div class="coh-section">
-          <div class="coh-checkbox-row">
-            <input type="checkbox" id="coh-lowercase" />
-            <label for="coh-lowercase">Write everything in lowercase (except proper nouns)</label>
+          <div class="coh-section">
+            <div class="coh-label">Typo level</div>
+            <div class="coh-slider-card">
+              <input type="range" id="coh-typo-slider" min="0" max="2" step="1" value="1" />
+              <div class="coh-slider-row">
+                <span data-tier="0">Low</span><span data-tier="1">Medium</span><span data-tier="2">High</span>
+              </div>
+            </div>
           </div>
+
+          <div class="coh-section">
+            <div class="coh-checkbox-row">
+              <input type="checkbox" id="coh-lowercase" />
+              <label for="coh-lowercase">Write everything in lowercase</label>
+            </div>
+          </div>
+
+          <button class="coh-generate-btn" id="coh-generate">Generate</button>
+          <div class="coh-shortcut-hint">Press Ctrl + Enter to generate</div>
+          <div class="coh-error" id="coh-error"></div>
         </div>
 
-        <button class="coh-generate-btn" id="coh-generate">Generate</button>
-        <div class="coh-error" id="coh-error"></div>
-      </div>
-
-      <div id="coh-result" class="coh-hidden">
-        <div class="coh-label">Result</div>
-        <div class="coh-result-text" id="coh-result-text"></div>
-        <div class="coh-btn-row">
-          <div class="coh-btn coh-replace" data-action="replace">Replace</div>
-          <div class="coh-btn" data-action="regenerate">Regenerate</div>
-          <div class="coh-btn" data-action="dismiss">Dismiss</div>
-        </div>
-        <div class="coh-regen-box" id="coh-regen-box">
-          <input type="text" id="coh-regen-input" placeholder="additional changes..." />
-          <button id="coh-regen-submit">Regenerate with changes</button>
+        <div id="coh-result" class="coh-hidden">
+          <div class="coh-label">Result</div>
+          <div class="coh-result-text" id="coh-result-text"></div>
+          <div class="coh-btn-row">
+            <div class="coh-btn coh-replace" data-action="replace">Replace</div>
+            <div class="coh-btn" data-action="regenerate">Regenerate</div>
+            <div class="coh-btn" data-action="dismiss">Dismiss</div>
+          </div>
+          <div class="coh-regen-box" id="coh-regen-box">
+            <input type="text" id="coh-regen-input" placeholder="Define your edits here (e.g. make it shorter, punchier)..." />
+            <button id="coh-regen-submit">Regenerate with changes</button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- SETTINGS VIEW -->
     <div class="coh-view" id="coh-view-settings">
-      <div class="coh-settings-intro">Paste your Gemini API key to get started. That's it — no model picking needed.</div>
-      <label class="coh-field-label">Google AI Studio API Key</label>
-      <div class="coh-key-row">
-        <input type="password" id="coh-api-key" class="coh-key-input" placeholder="AIza..." autocomplete="off" />
-        <span class="toggle-key" id="coh-toggle-key">SHOW</span>
+      <div class="coh-card">
+        <div class="coh-settings-intro">Paste your Gemini API key below to enable Tpyo text humanization.</div>
+        <label class="coh-field-label">Google AI Studio API Key</label>
+        <div class="coh-key-row">
+          <input type="password" id="coh-api-key" class="coh-key-input" placeholder="AIza..." autocomplete="off" />
+          <span class="toggle-key" id="coh-toggle-key">SHOW</span>
+        </div>
+        <div class="coh-hint">
+          Get a key from <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a>.
+        </div>
+        <button id="coh-save-settings">Save Key</button>
+        <div id="coh-settings-status"></div>
       </div>
-      <div class="coh-hint">
-        Get a free key from <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a>.
-      </div>
-      <button id="coh-save-settings">Save</button>
-      <div id="coh-settings-status"></div>
     </div>
   </div>
 

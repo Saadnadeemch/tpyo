@@ -1,14 +1,13 @@
 // background.js — MV3 service worker. Calls the Gemini API using the user's
-// own API key (from Google AI Studio), and manages the "disable on this tab"
-// context-menu toggle.
+// own API key (from Google AI Studio) and listens for global keyboard shortcuts.
 
-const MODEL_TIERS = ["gemini-3.5-flash", "gemini-3.1-flash-lite"];
+const MODEL_TIERS = ["gemini-3.1-flash-lite"];
 const disabledTabs = new Set(); 
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "coh-disable-tab",
-    title: "Disable Humanizer icon on this tab",
+    title: "Disable Tpyo shortcut on this tab",
     contexts: ["editable"]
   });
 });
@@ -20,6 +19,16 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.tabs.onRemoved.addListener((tabId) => disabledTabs.delete(tabId));
+
+// Listen for Alt + T command shortcut defined in manifest.json
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command === "trigger-tpyo") {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab?.id && !disabledTabs.has(tab.id)) {
+      chrome.tabs.sendMessage(tab.id, { type: "COH_TOGGLE_PANEL" }).catch(() => {});
+    }
+  }
+});
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg?.type === "COH_CHECK_DISABLED") {
@@ -34,14 +43,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const { apiKey } = await chrome.storage.sync.get(["apiKey"]);
 
       if (!apiKey) {
-        sendResponse({ ok: false, error: "No API key found. Please open configuration settings." });
+        sendResponse({ ok: false, error: "No API key found. Please configure your key in Tpyo settings." });
         return;
       }
 
       // Fetch the raw string directly from the model
       const rawText = await callGeminiWithFallback(apiKey, msg.prompt, 0);
       
-      // Directly return the raw text string to content.js
+      // Directly return the raw text string to content.js or popup.js
       sendResponse({ ok: true, data: rawText });
     } catch (err) {
       sendResponse({ ok: false, error: err.message || String(err) });
